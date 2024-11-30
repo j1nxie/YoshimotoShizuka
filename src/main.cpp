@@ -149,7 +149,7 @@ public:
             } else if (request.method == "POST") {
                 response = handlePost(request.path, request.body);
             } else {
-                response = createResponse(400, "\"error\": \"Method not supported.\"");
+                response = createResponse(400, "\"error\": \"Method not supported.\"}");
             }
 
             send(new_socket, response.c_str(), response.length(), 0);
