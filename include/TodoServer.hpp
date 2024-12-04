@@ -31,6 +31,8 @@ private:
     };
 
     HttpRequest parseRequest(const std::string &request);
+    std::string readFullRequest(int socket);
+    std::string handleConnection(int client_socket);
     std::string createResponse(int status, const std::string &content);
     std::string handleGet(const std::string &path);
     std::string handlePost(const std::string &path, const std::string &body);

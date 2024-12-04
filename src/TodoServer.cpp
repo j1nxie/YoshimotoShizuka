@@ -27,6 +27,35 @@ TodoServer::HttpRequest TodoServer::parseRequest(const std::string &request) {
     return req;
 }
 
+std::string TodoServer::readFullRequest(int socket) {
+    std::string request;
+    std::vector<char> buffer(1024);
+    ssize_t bytes_read;
+
+    while ((bytes_read = read(socket, buffer.data(), buffer.size())) > 0) {
+        request.append(buffer.data(), bytes_read);
+
+        if (request.find("\r\n\r\n") != std::string::npos) {
+            break;
+        }
+    }
+
+    return request;
+}
+
+std::string TodoServer::handleConnection(int client_socket) {
+    std::string request = readFullRequest(client_socket);
+    auto parsed_request = parseRequest(request);
+
+    if (parsed_request.method == "GET") {
+        return handleGet(parsed_request.path);
+    } else if (parsed_request.method == "POST") {
+        return handlePost(parsed_request.path, parsed_request.body);
+    } else {
+        return createResponse(400, "{\"error\": \"Method not supported.\"}");
+    }
+}
+
 std::string TodoServer::createResponse(int status, const std::string &content) {
     std::string status_text = (status == 200)   ? "OK"
                               : (status == 201) ? "Created"
@@ -102,25 +131,13 @@ void TodoServer::start() {
     while (true) {
         int new_socket;
         int addrlen = sizeof(address);
-        char buffer[1024] = {0};
 
         if ((new_socket = accept(server_fd, reinterpret_cast<struct sockaddr *>(&address),
                                  reinterpret_cast<socklen_t *>(&addrlen))) < 0) {
             throw std::runtime_error("accept failed");
         }
 
-        read(new_socket, buffer, 1024);
-
-        auto request = parseRequest(std::string(buffer));
-        std::string response;
-
-        if (request.method == "GET") {
-            response = handleGet(request.path);
-        } else if (request.method == "POST") {
-            response = handlePost(request.path, request.body);
-        } else {
-            response = createResponse(400, "\"error\": \"Method not supported.\"}");
-        }
+        std::string response = handleConnection(new_socket);
 
         send(new_socket, response.c_str(), response.length(), 0);
         close(new_socket);
