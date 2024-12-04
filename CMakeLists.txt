@@ -13,6 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Dependencies
 find_package(nlohmann_json REQUIRED)
+find_package(SQLite3 REQUIRED)
 
 # Compiler warnings
 if(ENABLE_WARNINGS)
@@ -42,6 +43,8 @@ endif()
 # Source files
 set(SOURCES
     src/main.cpp
+    src/TodoEntry.cpp
+    src/TodoServer.cpp
 )
 
 # Main executable
@@ -55,6 +58,10 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         nlohmann_json::nlohmann_json
+)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        SQLite::SQLite3
 )
 
 # Testing

@@ -6,3 +6,4 @@ build/
 *.dylib
 *.dll
 *.exe
+database.db
