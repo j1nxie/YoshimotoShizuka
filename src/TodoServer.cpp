@@ -63,7 +63,7 @@ std::string TodoServer::createResponse(int status, const std::string &content) {
                                                 : "Bad Request";
 
     std::stringstream response;
-    response << "HTTP 1.1" << status << " " << status_text << "\r\n";
+    response << "HTTP/1.1 " << status << " " << status_text << "\r\n";
     response << "Content-Type: application/json\r\n";
     response << "Content-Length: " << content.length() << "\r\n";
     response << "Access-Control-Allow-Origin: *\r\n";
