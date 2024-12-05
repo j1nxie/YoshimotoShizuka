@@ -23,7 +23,6 @@ private:
     HttpRequest parseRequest(const std::string &request);
     std::string readFullRequest(int socket);
     void handleConnection(int client_socket);
-    std::string createHttpResponse(const HttpResponse &response);
 
 public:
     TodoServer(uint16_t port, sqlite3 *db);

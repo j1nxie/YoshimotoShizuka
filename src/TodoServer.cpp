@@ -52,27 +52,6 @@ std::string TodoServer::readFullRequest(int socket) {
     return request;
 }
 
-std::string TodoServer::createHttpResponse(const HttpResponse &response) {
-    std::stringstream ss;
-    ss << "HTTP/1.1 " << response.status() << " "
-       << (response.status() == 200   ? "OK"
-           : response.status() == 201 ? "Created"
-           : response.status() == 404 ? "Not Found"
-                                      : "Bad Request")
-       << "\r\n";
-
-    for (const auto &[key, value] : response.headers()) {
-        ss << key << ": " << value << "\r\n";
-    }
-
-    ss << "Access-Control-Allow-Origin: *\r\n";
-    ss << "Content-Length: " << response.body().length() << "\r\n";
-    ss << "\r\n";
-    ss << response.body();
-
-    return ss.str();
-}
-
 void TodoServer::handleConnection(int client_socket) {
     std::string request = readFullRequest(client_socket);
     HttpRequest req = parseRequest(request);
@@ -85,7 +64,7 @@ void TodoServer::handleConnection(int client_socket) {
         res.body("Not Found");
     }
 
-    std::string responseStr = createHttpResponse(res);
+    std::string responseStr = res.toString();
     send(client_socket, responseStr.c_str(), responseStr.length(), 0);
 }
 

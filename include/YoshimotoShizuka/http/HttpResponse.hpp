@@ -20,6 +20,8 @@ public:
     void body(const std::string& content);
 
     void status(int code);
+
+    std::string toString() const;
 };
 
 #endif
