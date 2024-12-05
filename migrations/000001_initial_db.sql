@@ -5,7 +5,7 @@ PRAGMA application_id = 0x14585583;
 PRAGMA foreign_keys = ON;
 
 -- enable write-ahead logging
-PRAGMA journal_mode=WAL;
+PRAGMA journal_mode = WAL;
 
 CREATE TABLE todo (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
