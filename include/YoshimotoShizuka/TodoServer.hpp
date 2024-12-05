@@ -7,7 +7,6 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include <TodoEntry.hpp>
 #include <cstdint>
 #include <nlohmann/json.hpp>
 #include <string>
