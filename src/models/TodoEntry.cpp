@@ -1,4 +1,4 @@
-#include "YoshimotoShizuka/TodoEntry.hpp"
+#include "YoshimotoShizuka/models/TodoEntry.hpp"
 
 json TodoEntry::to_json() const {
     return {{"id", id},

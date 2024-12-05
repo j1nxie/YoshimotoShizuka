@@ -5,8 +5,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "YoshimotoShizuka/TodoEntry.hpp"
 #include "YoshimotoShizuka/http/HttpRequest.hpp"
+#include "YoshimotoShizuka/models/TodoEntry.hpp"
 
 TodoServer::TodoServer(uint16_t port, sqlite3 *db) : port(port), db(db) { setupRoutes(); }
 
@@ -69,7 +69,7 @@ void TodoServer::handleConnection(int client_socket) {
 }
 
 void TodoServer::setupRoutes() {
-    router.get("/todos", [this](const HttpRequest &req, HttpResponse &res) {
+    router.get("/todos", [this](const HttpRequest &_, HttpResponse &res) {
         json response = json::array();
 
         sqlite3_stmt *stmt;

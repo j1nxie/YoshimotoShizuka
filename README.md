@@ -4,6 +4,12 @@
 
 a little to-do list backend in C++, for fun.
 
+## project structure
+
+- `db/`: a migrator interface for SQLite3.
+- `http/`: HTTP-related classes and the router abstractions.
+- `models/`: the models for the to-do list.
+
 ## requirements
 
 - `nlohmann/json`
