@@ -45,6 +45,7 @@ set(SOURCES
     src/main.cpp
     src/TodoEntry.cpp
     src/TodoServer.cpp
+    src/Migrator.cpp
 )
 
 # Main executable

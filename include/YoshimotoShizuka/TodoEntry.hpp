@@ -10,6 +10,8 @@ struct TodoEntry {
     int id;
     std::string title;
     bool completed;
+    std::string created_at;
+    std::string updated_at;
 
     json to_json() const;
 };

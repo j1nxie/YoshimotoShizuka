@@ -7,6 +7,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
+#include "YoshimotoShizuka/Migrator.hpp"
 #include "YoshimotoShizuka/TodoServer.hpp"
 
 int main() {
@@ -19,11 +20,20 @@ int main() {
             return 1;
         }
 
+        Migrator migrator(db, "migrations");
+
+        if (!migrator.runMigrations()) {
+            std::cerr << "failed to run database migrations." << std::endl;
+            sqlite3_close(db);
+
+            return 1;
+        }
+
         TodoServer server(8080, db);
 
         server.start();
     } catch (const std::exception &e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "error: " << e.what() << std::endl;
         return 1;
     }
 
