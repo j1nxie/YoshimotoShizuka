@@ -1,12 +1,16 @@
 #include "YoshimotoShizuka/TodoServer.hpp"
 
 #include <cstdint>
+#include <exception>
 #include <iostream>
 #include <sstream>
 
-TodoServer::TodoServer(uint16_t port, sqlite3 *db) : port(port), db(db) {}
+#include "YoshimotoShizuka/TodoEntry.hpp"
+#include "YoshimotoShizuka/http/HttpRequest.hpp"
 
-TodoServer::HttpRequest TodoServer::parseRequest(const std::string &request) {
+TodoServer::TodoServer(uint16_t port, sqlite3 *db) : port(port), db(db) { setupRoutes(); }
+
+HttpRequest TodoServer::parseRequest(const std::string &request) {
     HttpRequest req;
     std::istringstream iss(request);
     std::string line;
@@ -14,14 +18,19 @@ TodoServer::HttpRequest TodoServer::parseRequest(const std::string &request) {
     std::getline(iss, line);
     std::istringstream first_line(line);
 
-    first_line >> req.method >> req.path;
+    std::string method, path;
+
+    first_line >> method >> path;
+
+    req.method(method);
+    req.path(path);
 
     while (std::getline(iss, line) && line != "\r") {
     }
 
     std::string body;
     while (std::getline(iss, line)) {
-        req.body += line;
+        req.body() += line;
     }
 
     return req;
@@ -43,45 +52,52 @@ std::string TodoServer::readFullRequest(int socket) {
     return request;
 }
 
-std::string TodoServer::handleConnection(int client_socket) {
-    std::string request = readFullRequest(client_socket);
-    auto parsed_request = parseRequest(request);
+std::string TodoServer::createHttpResponse(const HttpResponse &response) {
+    std::stringstream ss;
+    ss << "HTTP/1.1 " << response.status() << " "
+       << (response.status() == 200   ? "OK"
+           : response.status() == 201 ? "Created"
+           : response.status() == 404 ? "Not Found"
+                                      : "Bad Request")
+       << "\r\n";
 
-    if (parsed_request.method == "GET") {
-        return handleGet(parsed_request.path);
-    } else if (parsed_request.method == "POST") {
-        return handlePost(parsed_request.path, parsed_request.body);
-    } else {
-        return createResponse(400, "{\"error\": \"Method not supported.\"}");
+    for (const auto &[key, value] : response.headers()) {
+        ss << key << ": " << value << "\r\n";
     }
+
+    ss << "Access-Control-Allow-Origin: *\r\n";
+    ss << "Content-Length: " << response.body().length() << "\r\n";
+    ss << "\r\n";
+    ss << response.body();
+
+    return ss.str();
 }
 
-std::string TodoServer::createResponse(int status, const std::string &content) {
-    std::string status_text = (status == 200)   ? "OK"
-                              : (status == 201) ? "Created"
-                              : (status == 404) ? "Not Found"
-                                                : "Bad Request";
+void TodoServer::handleConnection(int client_socket) {
+    std::string request = readFullRequest(client_socket);
+    HttpRequest req = parseRequest(request);
+    HttpResponse res;
 
-    std::stringstream response;
-    response << "HTTP/1.1 " << status << " " << status_text << "\r\n";
-    response << "Content-Type: application/json\r\n";
-    response << "Content-Length: " << content.length() << "\r\n";
-    response << "Access-Control-Allow-Origin: *\r\n";
-    response << "\r\n";
-    response << content;
+    try {
+        router.handleRequest(req, res);
+    } catch (const std::exception &e) {
+        res.status(404);
+        res.body("Not Found");
+    }
 
-    return response.str();
+    std::string responseStr = createHttpResponse(res);
+    send(client_socket, responseStr.c_str(), responseStr.length(), 0);
 }
 
-std::string TodoServer::handleGet(const std::string &path) {
-    if (path == "/todos") {
+void TodoServer::setupRoutes() {
+    router.get("/todos", [this](const HttpRequest &req, HttpResponse &res) {
         json response = json::array();
 
         sqlite3_stmt *stmt;
         const char *sql = "SELECT * FROM todo;";
 
         if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
-            if (sqlite3_step(stmt) == SQLITE_ROW) {
+            while (sqlite3_step(stmt) == SQLITE_ROW) {
                 int id = sqlite3_column_int(stmt, 0);
                 const char *title = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
                 bool completed = sqlite3_column_int(stmt, 2);
@@ -90,33 +106,16 @@ std::string TodoServer::handleGet(const std::string &path) {
                 const char *updated_at =
                     reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
 
-                TodoEntry todo{id, title, completed, created_at, updated_at};
+                TodoEntry todo = {id, title, completed, created_at, updated_at};
+
                 response.push_back(todo.to_json());
             }
         }
 
         sqlite3_finalize(stmt);
 
-        return createResponse(200, response.dump());
-    }
-
-    return createResponse(404, "{\"error\": \"Not found\"}");
-}
-
-std::string TodoServer::handlePost(const std::string &path, const std::string &body) {
-    if (path == "/todos") {
-        try {
-            auto json_body = json::parse(body);
-            TodoEntry newTodo{nextId++, json_body["title"], false};
-            todos.push_back(newTodo);
-
-            return createResponse(201, newTodo.to_json().dump());
-        } catch (const std::exception &e) {
-            return createResponse(400, "{\"error\": \"Invalid request\"}");
-        }
-    }
-
-    return createResponse(400, "{\"error\": \"Invalid request\"}");
+        res.body(response.dump());
+    });
 }
 
 void TodoServer::start() {
@@ -154,9 +153,7 @@ void TodoServer::start() {
             throw std::runtime_error("accept failed");
         }
 
-        std::string response = handleConnection(new_socket);
-
-        send(new_socket, response.c_str(), response.length(), 0);
+        handleConnection(new_socket);
         close(new_socket);
     }
 }

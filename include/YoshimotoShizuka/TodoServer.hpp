@@ -11,30 +11,23 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-#include "TodoEntry.hpp"
+#include "YoshimotoShizuka/http/HttpRouter.hpp"
 
 using json = nlohmann::json;
 
 class TodoServer {
 private:
-    std::vector<TodoEntry> todos;
+    HttpRouter router;
     int nextId = 1;
     int server_fd;
     uint16_t port;
     sqlite3 *db;
 
-    struct HttpRequest {
-        std::string method;
-        std::string path;
-        std::string body;
-    };
-
+    void setupRoutes();
     HttpRequest parseRequest(const std::string &request);
     std::string readFullRequest(int socket);
-    std::string handleConnection(int client_socket);
-    std::string createResponse(int status, const std::string &content);
-    std::string handleGet(const std::string &path);
-    std::string handlePost(const std::string &path, const std::string &body);
+    void handleConnection(int client_socket);
+    std::string createHttpResponse(const HttpResponse &response);
 
 public:
     TodoServer(uint16_t port, sqlite3 *db);

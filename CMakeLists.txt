@@ -46,6 +46,9 @@ set(SOURCES
     src/TodoEntry.cpp
     src/TodoServer.cpp
     src/Migrator.cpp
+    src/http/HttpRequest.cpp
+    src/http/HttpResponse.cpp
+    src/http/HttpRouter.cpp
 )
 
 # Main executable
