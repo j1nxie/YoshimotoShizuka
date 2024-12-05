@@ -4,13 +4,27 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <string>
 
 #include "YoshimotoShizuka/TodoServer.hpp"
 #include "YoshimotoShizuka/db/Migrator.hpp"
+#include "laserpants/dotenv/dotenv.h"
 
 int main() {
+    dotenv::init();
+
+    const char *port_str = std::getenv("SERVER_PORT");
+    int port = 8080;
+
+    if (port_str != NULL && strcmp(port_str, "") != 0) {
+        port = std::stoi(port_str);
+    }
+
+    std::cout << "port: " << port << std::endl;
+
     try {
         sqlite3 *db;
         int result = sqlite3_open("database.db", &db);
@@ -29,7 +43,7 @@ int main() {
             return 1;
         }
 
-        TodoServer server(8080, db);
+        TodoServer server(port, db);
 
         server.start();
     } catch (const std::exception &e) {
