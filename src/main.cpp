@@ -7,8 +7,8 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-#include "YoshimotoShizuka/Migrator.hpp"
 #include "YoshimotoShizuka/TodoServer.hpp"
+#include "YoshimotoShizuka/db/Migrator.hpp"
 
 int main() {
     try {

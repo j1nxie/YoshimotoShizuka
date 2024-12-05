@@ -45,7 +45,7 @@ set(SOURCES
     src/main.cpp
     src/TodoEntry.cpp
     src/TodoServer.cpp
-    src/Migrator.cpp
+    src/db/Migrator.cpp
     src/http/HttpRequest.cpp
     src/http/HttpResponse.cpp
     src/http/HttpRouter.cpp

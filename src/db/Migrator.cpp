@@ -1,4 +1,4 @@
-#include "YoshimotoShizuka/Migrator.hpp"
+#include "YoshimotoShizuka/db/Migrator.hpp"
 
 #include <exception>
 #include <filesystem>
