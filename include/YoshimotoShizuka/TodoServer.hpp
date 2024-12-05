@@ -8,17 +8,13 @@
 #include <unistd.h>
 
 #include <cstdint>
-#include <nlohmann/json.hpp>
 #include <string>
 
 #include "YoshimotoShizuka/http/HttpRouter.hpp"
 
-using json = nlohmann::json;
-
 class TodoServer {
 private:
     HttpRouter router;
-    int nextId = 1;
     int server_fd;
     uint16_t port;
     sqlite3 *db;
