@@ -85,7 +85,6 @@ std::string Migrator::readSqlFile(const std::filesystem::path &path) {
 
 bool Migrator::runMigrations() {
     int currentVersion = getCurrentVersion();
-    std::cout << "current database version: " << currentVersion << std::endl;
 
     executeSql("BEGIN TRANSACTION;");
 
