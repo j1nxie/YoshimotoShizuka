@@ -28,32 +28,34 @@ std::string HttpRouter::methodToString(const HttpMethod& method) const {
     return std::get<std::string>(method);
 }
 
-void HttpRouter::handle(const std::string& path, HttpMethod method, HandlerFunction handler) {
+HttpRouter& HttpRouter::handle(const std::string& path, HttpMethod method,
+                               HandlerFunction handler) {
     routes[path][methodToString(method)] = handler;
+    return *this;
 }
 
-void HttpRouter::get(const std::string& path, HandlerFunction handler) {
-    handle(path, StandardHttpMethod::GET, handler);
+HttpRouter& HttpRouter::get(const std::string& path, HandlerFunction handler) {
+    return handle(path, StandardHttpMethod::GET, std::move(handler));
 }
 
-void HttpRouter::post(const std::string& path, HandlerFunction handler) {
-    handle(path, StandardHttpMethod::POST, handler);
+HttpRouter& HttpRouter::post(const std::string& path, HandlerFunction handler) {
+    return handle(path, StandardHttpMethod::POST, std::move(handler));
 }
 
-void HttpRouter::put(const std::string& path, HandlerFunction handler) {
-    handle(path, StandardHttpMethod::PUT, handler);
+HttpRouter& HttpRouter::put(const std::string& path, HandlerFunction handler) {
+    return handle(path, StandardHttpMethod::PUT, std::move(handler));
 }
 
-void HttpRouter::del(const std::string& path, HandlerFunction handler) {
-    handle(path, StandardHttpMethod::DELETE, handler);
+HttpRouter& HttpRouter::del(const std::string& path, HandlerFunction handler) {
+    return handle(path, StandardHttpMethod::DELETE, std::move(handler));
 }
 
-void HttpRouter::patch(const std::string& path, HandlerFunction handler) {
-    handle(path, StandardHttpMethod::PATCH, handler);
+HttpRouter& HttpRouter::patch(const std::string& path, HandlerFunction handler) {
+    return handle(path, StandardHttpMethod::PATCH, std::move(handler));
 }
 
-void HttpRouter::head(const std::string& path, HandlerFunction handler) {
-    handle(path, StandardHttpMethod::HEAD, handler);
+HttpRouter& HttpRouter::head(const std::string& path, HandlerFunction handler) {
+    return handle(path, StandardHttpMethod::HEAD, std::move(handler));
 }
 
 HandlerFunction HttpRouter::findHandler(const std::string& path, const std::string& method) const {

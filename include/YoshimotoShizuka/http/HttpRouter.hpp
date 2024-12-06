@@ -32,19 +32,19 @@ private:
     std::string methodToString(const HttpMethod& method) const;
 
 public:
-    void handle(const std::string& path, HttpMethod method, HandlerFunction handler);
+    HttpRouter& handle(const std::string& path, HttpMethod method, HandlerFunction handler);
 
-    void get(const std::string& path, HandlerFunction handler);
+    HttpRouter& get(const std::string& path, HandlerFunction handler);
 
-    void post(const std::string& path, HandlerFunction handler);
+    HttpRouter& post(const std::string& path, HandlerFunction handler);
 
-    void put(const std::string& path, HandlerFunction handler);
+    HttpRouter& put(const std::string& path, HandlerFunction handler);
 
-    void del(const std::string& path, HandlerFunction handler);
+    HttpRouter& del(const std::string& path, HandlerFunction handler);
 
-    void patch(const std::string& path, HandlerFunction handler);
+    HttpRouter& patch(const std::string& path, HandlerFunction handler);
 
-    void head(const std::string& path, HandlerFunction handler);
+    HttpRouter& head(const std::string& path, HandlerFunction handler);
 
     HandlerFunction findHandler(const std::string& path, const std::string& method) const;
 
