@@ -43,7 +43,7 @@ endif()
 # Source files
 set(SOURCES
     src/main.cpp
-    src/TodoEntry.cpp
+    src/models/TodoEntry.cpp
     src/TodoServer.cpp
     src/db/Migrator.cpp
     src/http/HttpRequest.cpp
