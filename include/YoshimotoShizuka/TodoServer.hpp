@@ -7,25 +7,17 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include <cstdint>
-#include <string>
-
 #include "YoshimotoShizuka/http/HttpRouter.hpp"
 
 class TodoServer {
 private:
     HttpRouter router;
-    int server_fd;
-    uint16_t port;
     sqlite3 *db;
 
     void setupRoutes();
-    HttpRequest parseRequest(const std::string &request);
-    std::string readFullRequest(int socket);
-    void handleConnection(int client_socket);
 
 public:
-    TodoServer(uint16_t port, sqlite3 *db);
+    TodoServer(sqlite3 *db);
     void start();
     ~TodoServer();
 };

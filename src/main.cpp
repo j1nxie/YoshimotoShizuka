@@ -16,15 +16,6 @@
 int main() {
     dotenv::init();
 
-    const char *port_str = std::getenv("SERVER_PORT");
-    int port = 8080;
-
-    if (port_str != NULL && strcmp(port_str, "") != 0) {
-        port = std::stoi(port_str);
-    }
-
-    std::cout << "port: " << port << std::endl;
-
     try {
         sqlite3 *db;
         int result = sqlite3_open("database.db", &db);
@@ -43,7 +34,7 @@ int main() {
             return 1;
         }
 
-        TodoServer server(port, db);
+        TodoServer server(db);
 
         server.start();
     } catch (const std::exception &e) {
