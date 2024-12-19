@@ -7,17 +7,20 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "YoshimotoShizuka/db/TodoRepository.hpp"
+#include "YoshimotoShizuka/http/HttpRequest.hpp"
 #include "YoshimotoShizuka/http/HttpRouter.hpp"
 
 class TodoServer {
 private:
     HttpRouter router;
-    sqlite3 *db;
+    TodoRepository repo;
 
     void setupRoutes();
+    void handleGetTodos(const HttpRequest& req, HttpResponse& res);
 
 public:
-    TodoServer(sqlite3 *db);
+    TodoServer(TodoRepository repo);
     void start();
     ~TodoServer();
 };

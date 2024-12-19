@@ -11,6 +11,7 @@
 
 #include "YoshimotoShizuka/TodoServer.hpp"
 #include "YoshimotoShizuka/db/Migrator.hpp"
+#include "YoshimotoShizuka/db/TodoRepository.hpp"
 #include "laserpants/dotenv/dotenv.h"
 
 int main() {
@@ -34,7 +35,8 @@ int main() {
             return 1;
         }
 
-        TodoServer server(db);
+        TodoRepository repo(db);
+        TodoServer server(repo);
 
         server.start();
     } catch (const std::exception &e) {
